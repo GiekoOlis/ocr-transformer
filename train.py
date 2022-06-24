@@ -2,6 +2,7 @@ import sys
 import torch
 import random
 import pathlib
+import wandb
 sys.path.append(str(pathlib.Path(__file__).parent.resolve())+'/src')
 
 from const import PATH_TEST_DIR, PATH_TEST_LABELS, FROM_CHECKPOINT_PATH, \
@@ -67,6 +68,16 @@ else:
   scheduler = None
 
 print(f'checkpoints are saved in {CHECKPOINTS_PATH} every {CHECKPOINT_FREQ} epochs')
-for epoch in range(1, N_EPOCHS, CHECKPOINT_FREQ):
-  fit(model, optimizer, scheduler, criterion, train_loader, test_loader, epoch, epoch+CHECKPOINT_FREQ)
-  torch.save(model.state_dict(), CHECKPOINTS_PATH+'checkpoint_{}.pt'.format(epoch+CHECKPOINT_FREQ))
+config={
+    "model": "Transformer model",
+    "encoder layers": ENC_LAYERS,
+    "decoder layers": DEC_LAYERS,
+    "num head": N_HEADS,
+    "dropout": DROPOUT,
+    "activation function": "PReLU"
+}
+with wandb.init(project="Simple-and-Efficient-Transformer-HTR", config=config):
+  for epoch in range(1, N_EPOCHS, CHECKPOINT_FREQ):
+    fit(model, optimizer, scheduler, criterion, train_loader, test_loader, epoch, epoch+CHECKPOINT_FREQ)
+    torch.save(model.state_dict(), CHECKPOINTS_PATH+'checkpoint_{}.pt'.format(epoch+CHECKPOINT_FREQ))
+    torch.save(model.state_dict(), '/content/drive/MyDrive/HTR_Transformer_weights/'+'checkpoint_PReLU_{}.pt'.format(epoch+CHECKPOINT_FREQ))

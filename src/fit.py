@@ -1,6 +1,7 @@
 from time import time
 import numpy as np
 import torch
+import wandb
 from const import TRAIN_LOG
 from config import DEVICE
 from utils import indicies_to_text, char_error_rate, evaluate, log_metrics
@@ -49,6 +50,11 @@ def fit(model, optimizer, scheduler, criterion, train_loader, val_loader, start_
       epoch_metrics['lr'] = optimizer.param_groups[0]["lr"]
       metrics.append(epoch_metrics)
       log_metrics(epoch_metrics, TRAIN_LOG)
+      wandb.log({
+            "epoch": epoch_metrics['epoch'],
+            "loss": epoch_metrics['train_loss'],
+            "lr": epoch_metrics['lr']
+        })
       if scheduler != None:
         scheduler.step(epoch_metrics['train_loss'])
     return metrics

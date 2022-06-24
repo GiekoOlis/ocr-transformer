@@ -1,7 +1,7 @@
 import math
 import torch
 import torch.nn as nn
-from torch.nn import Conv2d, MaxPool2d, BatchNorm2d, LeakyReLU
+from torch.nn import Conv2d, MaxPool2d, BatchNorm2d, PReLU
 from utils import PositionalEncoding, count_parameters, log_config
 from config import DEVICE, ALPHABET
 
@@ -33,7 +33,7 @@ class TransformerModel(nn.Module):
         self.bn5 = BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
         self.bn6 = BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
 
-        self.activ = LeakyReLU()
+        self.activ = PReLU()
 
         self.pos_encoder = PositionalEncoding(hidden, dropout)
         self.decoder = nn.Embedding(outtoken, hidden)
